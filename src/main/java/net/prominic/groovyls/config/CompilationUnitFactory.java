@@ -46,6 +46,7 @@ public class CompilationUnitFactory implements ICompilationUnitFactory {
 	private CompilerConfiguration config;
 	private GroovyClassLoader classLoader;
 	private List<String> additionalClasspathList;
+	private List<String> targetFolderList = new ArrayList<>();
 
 	public CompilationUnitFactory() {
 	}
@@ -121,6 +122,10 @@ public class CompilationUnitFactory implements ICompilationUnitFactory {
 
 		List<String> classpathList = new ArrayList<>();
 		getClasspathList(classpathList);
+
+		for (String targetFolder: targetFolderList) {
+			classpathList.add(targetFolder);
+		}
 		config.setClasspathList(classpathList);
 
 		return config;
@@ -200,5 +205,15 @@ public class CompilationUnitFactory implements ICompilationUnitFactory {
 				compilationUnit.getConfiguration(), compilationUnit.getClassLoader(),
 				compilationUnit.getErrorCollector());
 		compilationUnit.addSource(sourceUnit);
+	}
+
+	@Override
+	public List<String> getTargetFolderList() {
+		return this.targetFolderList;
+	}
+
+	@Override
+	public void setTargetFolderList(List<String> targetFolderList) {
+		this.targetFolderList = targetFolderList;
 	}
 }

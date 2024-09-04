@@ -36,6 +36,10 @@ public interface ICompilationUnitFactory {
 
 	public void setAdditionalClasspathList(List<String> classpathList);
 
+	public List<String> getTargetFolderList();
+
+	public void setTargetFolderList(List<String> targetFolderList);
+
 	/**
 	 * Returns a compilation unit.
 	 */

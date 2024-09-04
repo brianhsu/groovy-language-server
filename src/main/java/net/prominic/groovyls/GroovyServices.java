@@ -186,6 +186,23 @@ public class GroovyServices implements TextDocumentService, WorkspaceService, La
 	}
 
 	private void updateClasspath(JsonObject settings) {
+		List<String> classpathList = getAdditionalClassPath(settings);
+		List<String> targetFolderList = getTargetFolderList(settings);
+		boolean classpathListUpdated = !classpathList.equals(compilationUnitFactory.getAdditionalClasspathList());
+		boolean targetFolderListUpdated = !targetFolderList.equals(compilationUnitFactory.getTargetFolderList());
+
+		if (classpathListUpdated || targetFolderListUpdated) {
+			compilationUnitFactory.setAdditionalClasspathList(classpathList);
+			compilationUnitFactory.setTargetFolderList(targetFolderList);
+
+			createOrUpdateCompilationUnit();
+			compile();
+			visitAST();
+			previousContext = null;
+		}
+	}
+
+	public List<String> getAdditionalClassPath(JsonObject settings) {
 		List<String> classpathList = new ArrayList<>();
 
 		if (settings.has("groovy") && settings.get("groovy").isJsonObject()) {
@@ -197,16 +214,25 @@ public class GroovyServices implements TextDocumentService, WorkspaceService, La
 				});
 			}
 		}
-
-		if (!classpathList.equals(compilationUnitFactory.getAdditionalClasspathList())) {
-			compilationUnitFactory.setAdditionalClasspathList(classpathList);
-
-			createOrUpdateCompilationUnit();
-			compile();
-			visitAST();
-			previousContext = null;
-		}
+		return classpathList;
 	}
+
+	private List<String> getTargetFolderList(JsonObject settings) {
+		List<String> targetFolderList = new ArrayList<>();
+
+		if (settings.has("groovy") && settings.get("groovy").isJsonObject()) {
+			JsonObject groovy = settings.get("groovy").getAsJsonObject();
+			if (groovy.has("targetFolder") && groovy.get("targetFolder").isJsonArray()) {
+				JsonArray classpath = groovy.get("targetFolder").getAsJsonArray();
+				classpath.forEach(element -> {
+					targetFolderList.add(element.getAsString());
+				});
+			}
+		}
+		
+		return targetFolderList;
+	}
+
 
 	// --- REQUESTS
 
