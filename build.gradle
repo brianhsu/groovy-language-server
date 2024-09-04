@@ -32,6 +32,7 @@ dependencies {
   implementation "org.apache.groovy:groovy:4.0.5"
   implementation "com.google.code.gson:gson:2.8.7"
   implementation "io.github.classgraph:classgraph:4.8.138"
+  implementation 'org.apache.maven.shared:maven-invoker:3.3.0'
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.2"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.2"
 }

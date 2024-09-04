@@ -188,6 +188,13 @@ public class GroovyServices implements TextDocumentService, WorkspaceService, La
 	private void updateClasspath(JsonObject settings) {
 		List<String> classpathList = getAdditionalClassPath(settings);
 		List<String> targetFolderList = getTargetFolderList(settings);
+
+		System.out.println("Start to resolve pom...");
+		POMFileResolver pomFileResolver = new POMFileResolver(workspaceRoot);
+
+		System.out.println("Pom Resolved, resuilt:" + pomFileResolver.getResolvedClasspath());
+		classpathList.addAll(pomFileResolver.getResolvedClasspath());
+
 		boolean classpathListUpdated = !classpathList.equals(compilationUnitFactory.getAdditionalClasspathList());
 		boolean targetFolderListUpdated = !targetFolderList.equals(compilationUnitFactory.getTargetFolderList());
 
