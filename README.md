@@ -1,5 +1,36 @@
 # Groovy Language Server
 
+We use Java to write our produce code and use Groovy and spock framework to do unit test, and we heavily rely on Maven do pull our dependencies. Please be aware this is more likely a hack, I'm not expert on LSP nor groovy-ls, I just put a bunch of random code to make it work with my need. It might not work for you and the code quality probably is not that good.
+
+This fork add the following two things to the original version, so vim-lsp could work with our project more easily.
+
+1. It will add the dependency jar file classpath from `pom.xml` under your projects root.
+2. You can add 'targets' folder to the classpath, so class built from Java (for example, mvn compile) could be found by Grooy Language Server.
+
+For example, here is my lspconfig:
+
+```lua
+require('lspconfig')['groovyls'].setup{
+    cmd = { 'java', '-jar', groovy_language_server_path },
+    capabilities = cmp_capabilities,
+    settings = {
+        groovy = {
+            targetFolder = {'/home/brianhsu/HelloGroovy/target/classes/'}
+        }
+    },
+    root_dir = function ()
+        local project_root = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', 'pom.xml'}, { upward = true })[1])
+        if project_root == nil then
+            return vim.fn.getcwd()
+        else
+            return project_root
+        end
+    end
+}
+```
+
+------
+
 A [language server](https://microsoft.github.io/language-server-protocol/) for [Groovy](http://groovy-lang.org/).
 
 The following language server protocol requests are currently supported:
