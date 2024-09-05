@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
@@ -38,6 +39,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.codehaus.groovy.GroovyBugError;
@@ -190,7 +192,11 @@ public class GroovyServices implements TextDocumentService, WorkspaceService, La
 		List<String> targetFolderList = getTargetFolderList(settings);
 
 		System.out.println("Start to resolve pom...");
-		POMFileResolver pomFileResolver = new POMFileResolver(workspaceRoot);
+		Optional<String> mavenExecutable = Optional.ofNullable(settings.get("mavenExecutable"))
+			.filter(JsonElement::isJsonPrimitive)
+			.map(JsonElement::getAsString);
+
+		POMFileResolver pomFileResolver = new POMFileResolver(workspaceRoot, mavenExecutable);
 
 		System.out.println("Pom Resolved, resuilt:" + pomFileResolver.getResolvedClasspath());
 		classpathList.addAll(pomFileResolver.getResolvedClasspath());

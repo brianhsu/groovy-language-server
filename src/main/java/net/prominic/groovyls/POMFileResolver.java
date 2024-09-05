@@ -1,9 +1,11 @@
 package net.prominic.groovyls;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -13,10 +15,12 @@ import org.apache.maven.shared.invoker.Invoker;
 public class POMFileResolver {
 
     private final Path workspaceRoot;
+    private final Optional<String> mavenExecutable;
     private final JarFileListInvokerHandler handler = new JarFileListInvokerHandler();
 
-    public POMFileResolver(Path workspaceRoot) {
+    public POMFileResolver(Path workspaceRoot, Optional<String> mavenExecutable) {
         this.workspaceRoot = workspaceRoot;
+        this.mavenExecutable = mavenExecutable;
     }
 
     public List<String> getResolvedClasspath() {
@@ -34,6 +38,8 @@ public class POMFileResolver {
 
         Invoker invoker = new DefaultInvoker();
 
+        this.mavenExecutable.map(File::new).ifPresent(invoker::setMavenExecutable);
+
         try {
 
             invoker.execute(request);
@@ -44,7 +50,7 @@ public class POMFileResolver {
             return handler.getClasspathList();
 
         } catch (Exception e) {
-            throw new RuntimeException("Cannot invoke Maven to get classpath");
+            throw new RuntimeException("Cannot invoke Maven to get classpath", e);
         }
     }
 }
